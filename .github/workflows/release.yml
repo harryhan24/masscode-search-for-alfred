@@ -14,6 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Verify tag matches info.plist version
+        run: |
+          PLIST_VERSION=$(python3 -c "import plistlib; print(plistlib.load(open('info.plist','rb'))['version'])")
+          EXPECTED_TAG="v${PLIST_VERSION}"
+          if [ "${GITHUB_REF_NAME}" != "${EXPECTED_TAG}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match info.plist version ${PLIST_VERSION} (expected ${EXPECTED_TAG}). Bump info.plist before tagging."
+            exit 1
+          fi
+
       - name: Build .alfredworkflow bundle
         run: |
           zip -r MassCode-Search.alfredworkflow . \
