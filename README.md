@@ -8,11 +8,16 @@ Search your [massCode](https://masscode.io/) snippets from Alfred and paste them
 
 ## Features
 
-- Search snippets by name with the `mc` keyword
-- Filter by tag using `@tagname` (e.g. `mc @llm prompt`)
-- Tab-autocomplete tag names — type `mc @` to see all available tags
-- `Enter` copies the snippet contents to the clipboard
-- `Alt + Enter` opens the snippet directly in massCode
+- Three keywords: `m` (all), `mn` (notes), `mc` (code)
+- Filter by tag using `#tagname` (e.g. `m #llm prompt`)
+- Filter by folder using `/foldername` (e.g. `m /Inbox prompt`)
+- Tab-autocomplete tags and folders — type `m #` or `m /` to browse
+- Fuzzy name matching (fzf-style — characters can be non-contiguous)
+- `Enter` copies the snippet contents to the clipboard (for `m` / `mn`)
+- For code (`mc`), `Enter` opens the snippet in massCode and `Alt + Enter` copies to clipboard
+- `Alt + Enter` opens the snippet directly in massCode (for `m` / `mn`)
+
+Notes vs. code is detected by content language: `markdown` is treated as a note, anything else as code.
 
 ## Requirements
 
@@ -45,23 +50,32 @@ Open **Alfred Preferences → Workflows → MassCode Search → Configure Workfl
 
 The workflow calls Node at `/opt/homebrew/bin/node` (Homebrew on Apple Silicon). If you use a different setup, edit the **Script Filter**'s script field in Alfred:
 
-- Intel Mac (Homebrew): `/usr/local/bin/node index.mjs "$1"`
+- Intel Mac (Homebrew): `/usr/local/bin/node index.mjs all "$1"`
 - nvm / fnm / asdf: use the absolute path printed by `which node`
+
+(Each Script Filter passes a different mode argument: `all`, `note`, or `code`. Keep that first argument when changing the node path.)
 
 ## Usage
 
 | Input | Result |
 | --- | --- |
-| `mc` | List all snippets |
-| `mc react` | Snippets whose name contains `react` |
-| `mc @` | Tag picker (autocomplete) |
-| `mc @llm` | Snippets tagged `llm` |
-| `mc @llm prompt` | Snippets tagged `llm` whose name contains `prompt` |
+| `m` | List all snippets (notes + code) |
+| `mn` | Notes only |
+| `mc` | Code snippets only |
+| `m react` | Snippets whose name fuzzy-matches `react` |
+| `m #` | Tag picker (autocomplete) |
+| `m #llm` | Snippets tagged `llm` |
+| `m #llm prompt` | Snippets tagged `llm` whose name fuzzy-matches `prompt` |
+| `m /` | Folder picker (autocomplete) |
+| `m /Inbox` | Snippets in the `Inbox` folder |
+| `m /Inbox prompt` | Snippets in `Inbox` whose name fuzzy-matches `prompt` |
+
+Tag filtering and name search work the same way under `mn` and `mc`.
 
 Then:
 
-- `↵` — copy snippet contents to clipboard
-- `⌥ + ↵` — open snippet in the massCode app
+- `m` / `mn` — `↵` copies snippet contents, `⌥ + ↵` opens in massCode
+- `mc` — `↵` opens in massCode, `⌥ + ↵` copies snippet contents
 
 ## How it works
 
